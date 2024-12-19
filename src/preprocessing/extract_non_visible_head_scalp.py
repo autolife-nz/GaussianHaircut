@@ -94,7 +94,14 @@ def check_visiblity_of_faces(cams, masks, meshRasterizer, full_mesh, flame_mesh_
 
 
 def main(args):
-    mesh_head = load_objs_as_meshes([f'{args.flame_mesh_dir}/stage_3/mesh_final.obj'], device=args.device)
+
+    # if statement added by hemy 18/12/24
+    custom_head = os.environ.get('CUSTOM_HEAD') == '1'
+    if custom_head:
+        print("\033[96mLoading head.obj...\033[0m") #added by hemy 18/12/24
+        mesh_head = load_objs_as_meshes([f'{args.data_dir}/head.obj'], device=args.device) #added by hemy 11/12/24
+    else:
+        mesh_head = load_objs_as_meshes([f'{args.flame_mesh_dir}/stage_3/mesh_final.obj'], device=args.device)
 
     scalp_vert_idx = torch.load(f'{args.project_dir}/data/new_scalp_vertex_idx.pth').long().cuda()
     scalp_faces = torch.load(f'{args.project_dir}/data/new_scalp_faces.pth')[None].cuda() 
@@ -138,8 +145,10 @@ def main(args):
         size = torch.tensor([scale_y, scale_x]).to(args.device)
 
         raster_settings_mesh = RasterizationSettings(
-            image_size=(scale_y, scale_x), 
-            blur_radius=0.000, 
+            #image_size=(scale_y, scale_x), 
+            #blur_radius=0.000, 
+            image_size=(scale_y, scale_x), # Added by hemy 13/12/24
+            blur_radius=0.005, # Added by hemy 13/12/24
             faces_per_pixel=1)
 
         cams[k] = cameras_from_opencv_projection(

@@ -59,13 +59,26 @@ if __name__ == "__main__":
     parser.add_argument('--model_name', default='', type=str) 
     parser.add_argument('--iter', default=30_000, type=int) 
     parser.add_argument('--project_dir', default="", type=str)
+    parser.add_argument('--data_dir', default="", type=str) #added by hemy 11/12/24
     args = get_combined_args(parser)
 
-    print(f'{args.flame_mesh_dir}/stage_3/mesh_final.obj')
+    # if statement added by hemy 18/12/24
+    custom_head = os.environ.get('CUSTOM_HEAD') == '1'
+    if custom_head:
+        print(f'{args.data_dir}/head.obj') #added by hemy 11/12/24
 
-    mesh = trimesh.load(f'{args.flame_mesh_dir}/stage_3/mesh_final.obj')
+        mesh = trimesh.load(f'{args.data_dir}/head.obj') #added by hemy 11/12/24
 
-    mesh_head = load_objs_as_meshes([f'{args.flame_mesh_dir}/stage_3/mesh_final.obj'], device=args.device)
+        mesh_head = load_objs_as_meshes([f'{args.data_dir}/head.obj'], device=args.device) #added by hemy 11/12/24
+
+    else:
+
+        print(f'{args.flame_mesh_dir}/stage_3/mesh_final.obj')
+
+        mesh = trimesh.load(f'{args.flame_mesh_dir}/stage_3/mesh_final.obj')
+
+        mesh_head = load_objs_as_meshes([f'{args.flame_mesh_dir}/stage_3/mesh_final.obj'], device=args.device)
+
 
     scalp_vert_idx = torch.load(f'{args.project_dir}/data/new_scalp_vertex_idx.pth').long().cuda()
     scalp_faces = torch.load(f'{args.project_dir}/data/new_scalp_faces.pth')[None].cuda() 

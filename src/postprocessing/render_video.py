@@ -174,7 +174,13 @@ def main(blender_path, input_path, exp_name_1, exp_name_3, strand_length, speed_
     cameras_interp = np.stack(cameras_interp)[frames[0]:frames[-1]:speed_up][:max_frames]
     np.save(f'{input_path}/curves_reconstruction/{exp_name_3}/blender/cameras.npy', cameras_interp)
 
-    verts, faces, _ = load_obj(f'{input_path}/flame_fitting/{exp_name_1}/stage_3/mesh_final.obj')
+    # if statement added by hemy 18/12/24
+    custom_head = os.environ.get('CUSTOM_HEAD') == '1'
+    if custom_head:
+        verts, faces, _ = load_obj(f'{input_path}/head.obj') #added by hemy 11/12/24
+    else:
+        verts, faces, _ = load_obj(f'{input_path}/flame_fitting/{exp_name_1}/stage_3/mesh_final.obj')
+        
     save_ply(f'{input_path}/curves_reconstruction/{exp_name_3}/blender/raw_head.ply', verts=verts, faces=faces.verts_idx)
 
     # Unpack head model (which also contains hair in case of neus and unisurf)

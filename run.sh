@@ -5,6 +5,7 @@ export EXP_NAME_2="stage2"
 export EXP_NAME_3="stage3"
 export EXP_PATH_1=$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1
 
+export CUSTOM_HEAD=0 #1 to use custom head 0 to use default - added by hemy 18/12/24
 
 #
 # Ensure that the following environment variables are accessible to the script:
@@ -113,7 +114,7 @@ CUDA_VISIBLE_DEVICES="$GPU" python train_gaussians.py \
     -s $DATA_PATH -m "$EXP_PATH_1" -r 1 --port "888$GPU" \
     --trainable_cameras --trainable_intrinsics --use_barf \
     --lambda_dorient 0.1
-
+    
 # Run FLAME mesh fitting
 conda activate gaussian_splatting_hair
 cd $PROJECT_DIR/ext/NeuralHaircut/src/multiview_optimization
@@ -145,11 +146,22 @@ CUDA_VISIBLE_DEVICES="$GPU" python scale_scene_into_sphere.py \
     -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000
 
 # Remove hair Gaussians that intersect with the FLAME head mesh
-conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
-CUDA_VISIBLE_DEVICES="$GPU" python filter_flame_intersections.py \
-    --flame_mesh_dir $DATA_PATH/flame_fitting/$EXP_NAME_1 \
-    -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000 \
-    --project_dir $PROJECT_DIR/ext/NeuralHaircut
+# if statement added by hemy 18/12/24
+if [[$CUSTOM_HEAD -eq 1]]; then 
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
+    CUDA_VISIBLE_DEVICES="$GPU" python filter_flame_intersections.py \
+        --flame_mesh_dir $DATA_PATH/flame_fitting/$EXP_NAME_1 \
+        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000 \
+        --project_dir $PROJECT_DIR/ext/NeuralHaircut \
+        --data_dir $DATA_PATH #added by hemy 11/12/24
+else
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
+    CUDA_VISIBLE_DEVICES="$GPU" python filter_flame_intersections.py \
+        --flame_mesh_dir $DATA_PATH/flame_fitting/$EXP_NAME_1 \
+        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000 \
+        --project_dir $PROJECT_DIR/ext/NeuralHaircut
+fi
+
 
 # Run rendering for training views
 conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src
@@ -202,12 +214,22 @@ rm -rf "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1/train_cropped"
 # ##################
 
 # Export the resulting strands as pkl and ply
-conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
-CUDA_VISIBLE_DEVICES="$GPU" python export_curves.py \
-    --data_dir $DATA_PATH --model_name $EXP_NAME_3 --iter 10000 \
-    --flame_mesh_path "$DATA_PATH/flame_fitting/$EXP_NAME_1/stage_3/mesh_final.obj" \
-    --scalp_mesh_path "$DATA_PATH/flame_fitting/$EXP_NAME_1/scalp_data/scalp.obj" \
-    --hair_conf_path "$PROJECT_DIR/src/arguments/hair_strands_textured.yaml"
+# if statement added by hemy 18/12/24
+if [[$CUSTOM_HEAD -eq 1]]; then 
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
+    CUDA_VISIBLE_DEVICES="$GPU" python export_curves.py \
+        --data_dir $DATA_PATH --model_name $EXP_NAME_3 --iter 10000 \
+        --flame_mesh_path "$DATA_PATH/head.obj" \
+        --scalp_mesh_path "$DATA_PATH/flame_fitting/$EXP_NAME_1/scalp_data/scalp.obj" \
+        --hair_conf_path "$PROJECT_DIR/src/arguments/hair_strands_textured.yaml"
+else
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
+    CUDA_VISIBLE_DEVICES="$GPU" python export_curves.py \
+        --data_dir $DATA_PATH --model_name $EXP_NAME_3 --iter 10000 \
+        --flame_mesh_path "$DATA_PATH/flame_fitting/$EXP_NAME_1/stage_3/mesh_final.obj" \
+        --scalp_mesh_path "$DATA_PATH/flame_fitting/$EXP_NAME_1/scalp_data/scalp.obj" \
+        --hair_conf_path "$PROJECT_DIR/src/arguments/hair_strands_textured.yaml"
+fi
 
 # Render the visualizations
 conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/postprocessing
