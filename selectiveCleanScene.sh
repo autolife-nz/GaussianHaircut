@@ -1,1 +1,1 @@
-find scene/* ! \( -name "*.mp4" -o -name "*.obj" \) -type f -exec rm {} \;
+find scene/* ! \( -name "*.mp4" -o -name "*.obj" \) -exec rm -r {} \;
