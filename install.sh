@@ -1,4 +1,11 @@
 # Prerequisites:
+###
+ # @Descripttion: your project
+ # @Author: QI
+ # @Date: 2024-11-12 11:49:19
+ # @LastEditors: QI
+ # @LastEditTime: 2024-11-13 15:57:11
+### 
 #
 # 1. Install CUDA 11.8
 #    Follow intructions on https://developer.nvidia.com/cuda-11-8-0-download-archive
@@ -13,6 +20,7 @@
 #    Follow instructions on https://www.blender.org/download/lts/3-6
 #
 
+
 # Need to use this to activate conda environments
 eval "$(conda shell.bash hook)"
 
@@ -25,7 +33,7 @@ cd $PROJECT_DIR/ext && git clone https://github.com/CMU-Perceptual-Computing-Lab
 cd $PROJECT_DIR/ext/openpose && git submodule update --init --recursive --remote
 cd $PROJECT_DIR/ext && git clone https://github.com/hustvl/Matte-Anything
 cd $PROJECT_DIR/ext/Matte-Anything && git clone https://github.com/IDEA-Research/GroundingDINO.git
-cd $PROJECT_DIR/ext && git clone git@github.com:egorzakharov/NeuralHaircut.git --recursive
+cd $PROJECT_DIR/ext && git clone https://github.com/egorzakharov/NeuralHaircut.git --recursive
 cd $PROJECT_DIR/ext && git clone https://github.com/facebookresearch/pytorch3d
 cd $PROJECT_DIR/ext/pytorch3d && git checkout 2f11ddc5ee7d6bd56f2fb6744a16776fab6536f7
 cd $PROJECT_DIR/ext && git clone https://github.com/camenduru/simple-knn
@@ -69,8 +77,9 @@ gdown 1d97oKuITCeWgai2Tf3iNilt6rMSSYzkW
 
 # OpenPose
 cd $PROJECT_DIR/ext/openpose
-gdown 1Yn03cKKfVOq4qXmgBMQD20UMRRRkd_tV && tar -xvzf models.tar.gz && rm models.tar.gz # downloads openpose checkpoint
-conda deactivate
+# gdown 1Yn03cKKfVOq4qXmgBMQD20UMRRRkd_tV && tar -xvzf models.tar.gz && rm models.tar.gz # downloads openpose checkpoint（注意这个得手动倒进去，不能用gdown下）
+tar -xvzf models.tar.gz && rm models.tar.gz # downloads openpose checkpoint
+conda deactivate# conda 停用
 git submodule update --init --recursive --remote
 conda create -y -n openpose cmake=3.20 -c conda-forge # needed to avoid cmake complining error
 conda activate openpose
@@ -83,8 +92,8 @@ cmake .. -DBUILD_PYTHON=true -DUSE_CUDNN=off
 make -j8
 conda deactivate
 
-# PIXIE
-cd $PROJECT_DIR/ext && git clone https://github.com/yfeng95/PIXIE
+# PIXIE# # 小精灵
+# cd $PROJECT_DIR/ext && git clone https://github.com/yfeng95/PIXIE# # cd $PROJECT_DIR/ext & git clone https://github.com/yfeng95/PIXIE
 cd $PROJECT_DIR/ext/PIXIE
 chmod +x fetch_model.sh && ./fetch_model.sh
 conda create -y -n pixie-env python=3.8 pytorch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 \
@@ -92,4 +101,4 @@ conda create -y -n pixie-env python=3.8 pytorch==2.0.0 torchvision==0.15.0 torch
     -c pytorch -c nvidia -c fvcore -c conda-forge -c pytorch3d # this environment works with RTX 4090
 conda activate pixie-env
 pip install pyyaml==5.4.1
-pip install git+https://github.com/1adrianb/face-alignment.git@54623537fd9618ca7c15688fd85aba706ad92b59 # install this commit to avoid error
+pip install git+https://github.com/1adrianb/face-alignment.git@54623537fd9618ca7c15688fd85aba706ad92b59 # install this commit to avoid error (手动下载,因为下载不下来)

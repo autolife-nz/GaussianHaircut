@@ -3,6 +3,8 @@ export CAMERA="PINHOLE"
 export EXP_NAME_1="stage1"
 export EXP_NAME_2="stage2"
 export EXP_NAME_3="stage3"
+export EXP_PATH_1=$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1
+
 
 #
 # Ensure that the following environment variables are accessible to the script:
@@ -98,14 +100,12 @@ cd $PROJECT_DIR/src/preprocessing
 CUDA_VISIBLE_DEVICES="$GPU" python colmap_parsing.py \
     --path_to_scene $DATA_PATH
 
-# Remove raw files to preserve disk space
+# Remove raw files to preserve disk space（磁盘够，这里我先不删了）
 rm -rf $DATA_PATH/input $DATA_PATH/images $DATA_PATH/masks $DATA_PATH/iqa*
 
-##################
-# RECONSTRUCTION #
-##################
-
-export EXP_PATH_1=$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1
+# ##################
+# # RECONSTRUCTION #
+# ##################
 
 # Run 3D Gaussian Splatting reconstruction
 conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src
@@ -194,11 +194,12 @@ CUDA_VISIBLE_DEVICES="$GPU" python train_strands.py \
     --trainable_cameras --trainable_intrinsics --use_barf \
     --iterations 10000 --port "800$GPU"
 
+######################################### HERE #############################################
 rm -rf "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1/train_cropped"
 
-##################
-# VISUALIZATIONS #
-##################
+# ##################
+# # VISUALIZATIONS #
+# ##################
 
 # Export the resulting strands as pkl and ply
 conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing

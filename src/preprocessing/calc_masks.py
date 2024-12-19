@@ -216,6 +216,8 @@ filenames = [f'{data_dir}/images{args.postfix}/{img_name}' for img_name in img_n
 # filenames = glob.glob(f'{data_dir}/images{args.postfix}/*')
 
 for filename in tqdm.tqdm(sorted(filenames)):
+    if os.path.isdir(filename):  # 如果是目录，跳过
+        continue
     with torch.no_grad():
         img = Image.open(filename)
         orig_img_size = img.size

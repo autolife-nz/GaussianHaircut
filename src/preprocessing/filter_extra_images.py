@@ -112,11 +112,24 @@ def main(args):
     print(img_names_split)
 
     img_names_filtered = []
+    # for img_names_chunk in img_names_split:
+    #     iqa_scores_chunk = []
+    #     for img_name in img_names_chunk:
+    #         iqa_scores_chunk.append(iqa_scores[img_name.replace('.png', '')])
+    #     img_names_filtered.append(img_names_chunk[np.argmax(np.asarray(iqa_scores_chunk))])
     for img_names_chunk in img_names_split:
-        iqa_scores_chunk = []
-        for img_name in img_names_chunk:
-            iqa_scores_chunk.append(iqa_scores[img_name.replace('.png', '')])
-        img_names_filtered.append(img_names_chunk[np.argmax(np.asarray(iqa_scores_chunk))])
+        iqa_scores_chunk = [iqa_scores[img_name.replace('.png', '')] for img_name in img_names_chunk if img_name.replace('.png', '') in iqa_scores]
+
+        # Check if iqa_scores_chunk is empty before finding the argmax
+        if iqa_scores_chunk:
+            max_index = np.argmax(np.asarray(iqa_scores_chunk))
+            img_names_filtered.append(img_names_chunk[max_index])
+        else:
+            # Handle the case where there are no valid scores; could log or take alternative action
+            print(f"No valid IQA scores found for images: {img_names_chunk}")
+            # Optionally append a placeholder or take other corrective actions
+            img_names_filtered.append(None)  # Append None or a default value if needed
+
     
     pkl.dump(img_names_filtered, open(f'{data_path}/iqa_filtered_names.pkl', 'wb'))
 
@@ -125,7 +138,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--data_path', default='', type=str)
     parser.add_argument('--max_imgs', default=128, type=int)
-    parser.add_argument('--iqa_threshold', default=50, type=float)
+    parser.add_argument('--iqa_threshold', default=25, type=float)
 
     args, _ = parser.parse_known_args()
     args = parser.parse_args()
