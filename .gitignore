@@ -189,3 +189,7 @@ cython_debug/
 
 # Exlude nohup
 nohup.out
+
+# Exlude new external libraries
+ext/hyperIQA
+ext/simple-knn
