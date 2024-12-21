@@ -5,7 +5,13 @@ export EXP_NAME_2="stage2"
 export EXP_NAME_3="stage3"
 export EXP_PATH_1=$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1
 
-export CUSTOM_HEAD=0 #1 to use custom head 0 to use default - added by hemy 18/12/24
+export REPLACE_FLAME_FITTING_MESH=1 # 1 to replace mesh_final.obj with custom obj 0 to use default - added by hemy 22/12/24
+
+if [[$REPLACE_FLAME_FITTING_MESH -eq 0]]; then  # to use the head.obj method turn REPLACE_FLAME_FITTING_MESH to 0
+    export CUSTOM_HEAD=0 #1 to use custom head 0 to use default - added by hemy 18/12/24
+else
+    export CUSTOM_HEAD=0 #do not edit this line
+fi
 
 #
 # Ensure that the following environment variables are accessible to the script:
@@ -139,12 +145,20 @@ CUDA_VISIBLE_DEVICES="$GPU" python fit.py --conf confs/train_person_1_.conf \
     --data_path $DATA_PATH \
     --fitted_camera_path $EXP_PATH_1/cameras/30000_matrices.pkl
 
+# Replace mesh_final.obj with obj located in Scene
+if [[$REPLACE_FLAME_FITTING_MESH -eq 1]]; then 
+    conda activate gaussian_splatting_hair
+    python replace_mesh.py \
+        --data_path "$DATA_PATH" \
+        --flame_mesh_path "$DATA_PATH/flame_fitting/$EXP_NAME_1/stage_3/mesh_final.obj"
+fi
+
 # Crop the reconstructed scene
 conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
 CUDA_VISIBLE_DEVICES="$GPU" python scale_scene_into_sphere.py \
     --path_to_data $DATA_PATH \
     -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000
-
+    
 # Remove hair Gaussians that intersect with the FLAME head mesh
 # if statement added by hemy 18/12/24
 if [[$CUSTOM_HEAD -eq 1]]; then 
