@@ -33,12 +33,7 @@ def main(args):
     dif_mask = 1 - torch.load(f'{data_path}/dif_mask.pth')
     ToPILImage()(dif_mask).save(f'{data_path}/flame_fitting/scalp_data/dif_mask.png')
     os.remove(f'{data_path}/dif_mask.pth')
-    # if statement added by hemy 18/12/24
-    custom_head = os.environ.get('CUSTOM_HEAD') == '1'
-    if custom_head:
-        shutil.move(f'{data_path}/scaled_head_prior.obj', f'{data_path}head.obj') #added by hemy 11/12/24
-    else:
-        shutil.move(f'{data_path}/scaled_head_prior.obj', f'{data_path}/flame_fitting/stage_3/mesh_final.obj')
+    shutil.move(f'{data_path}/scaled_head_prior.obj', f'{data_path}/flame_fitting/stage_3/mesh_final.obj')
 
 
 if __name__ == "__main__":

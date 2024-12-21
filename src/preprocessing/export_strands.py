@@ -57,12 +57,7 @@ if __name__ == "__main__":
     os.makedirs(f'{args.data_dir}/strands_reconstruction/{args.model_name}/strands', exist_ok=True)
     p_npy = p.cpu().numpy()
 
-    # if statement added by hemy 18/12/24
-    custom_head = os.environ.get('CUSTOM_HEAD') == '1'
-    if custom_head:
-        mesh = trimesh.load(f'{args.data_dir}/head.obj') #added by hemy 11/12/24
-    else:
-        mesh = trimesh.load(f'{args.flame_mesh_dir}/stage_3/mesh_final.obj')
+    mesh = trimesh.load(f'{args.flame_mesh_dir}/stage_3/mesh_final.obj')
 
     sdf_handle = SDF(mesh.vertices, mesh.faces)
 
