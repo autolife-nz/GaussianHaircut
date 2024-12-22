@@ -24,9 +24,9 @@ export REPLACE_FLAME_FITTING_MESH=1 # 1 to replace mesh_final.obj with custom ob
 eval "$(conda shell.bash hook)"
 
 
-#################
-# PREPROCESSING #
-#################
+#####################
+# 1 - PREPROCESSING #
+#####################
 if [[ ($CONTINUE_PROCESSES -le 1 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 1) ]]; then 
 
     # Arrange raw images into a 3D Gaussian Splatting format
@@ -128,9 +128,9 @@ if [[ ($CONTINUE_PROCESSES -le 1 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_P
 
 fi
 
-##################
-# RECONSTRUCTION #
-##################
+######################
+# 2 - RECONSTRUCTION #
+######################
 if [[ ($CONTINUE_PROCESSES -le 2 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 2) ]]; then
     
     # Run 3D Gaussian Splatting reconstruction
@@ -170,9 +170,9 @@ if [[ ($CONTINUE_PROCESSES -le 2 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_P
 
 fi
 
-###########
-# REPLACE #
-###########
+###############
+# 3 - REPLACE #
+###############
 if [[ ($CONTINUE_PROCESSES -le 3 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 3) ]]; then
     
     # Replace mesh_final.obj with obj located in Scene
@@ -186,9 +186,9 @@ if [[ ($CONTINUE_PROCESSES -le 3 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_P
 
 fi
 
-############################
-# RECONSTRUCTION CONTINUED #
-############################
+################################
+# 4 - RECONSTRUCTION CONTINUED #
+################################
 if [[ ($CONTINUE_PROCESSES -le 4 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 4) ]]; then
     
     # Crop the reconstructed scene
@@ -216,9 +216,9 @@ if [[ ($CONTINUE_PROCESSES -le 4 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_P
 
 fi
 
-########################################################
-# RECONSTRUCTION CONTINUED - Scalp and Strand Training #
-########################################################
+############################################################
+# 5 - RECONSTRUCTION CONTINUED - Scalp and Strand Training #
+############################################################
 if [[ ($CONTINUE_PROCESSES -le 5 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 5) ]]; then
 
     # Get FLAME mesh scalp maps
@@ -265,9 +265,9 @@ if [[ ($CONTINUE_PROCESSES -le 5 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_P
 
 fi
 
-##################
-# VISUALIZATIONS #
-##################
+######################
+# 6 - VISUALIZATIONS #
+######################
 if [[ ($CONTINUE_PROCESSES -le 6 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 6) ]]; then
     
     # Export the resulting strands as pkl and ply

@@ -37,6 +37,7 @@ def replace_mesh_final(data_path, flame_mesh_path):
     # Replace mesh_final.obj with the selected .obj file
     shutil.copy(os.path.join("selected_obj", obj_file), flame_mesh_path)
 
+    print("Path:", flame_mesh_path)  # Print the path
     print("Replaced mesh_final.obj with", obj_file)
 
 if __name__ == "__main__":
