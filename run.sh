@@ -28,7 +28,7 @@ eval "$(conda shell.bash hook)"
 # PREPROCESSING #
 #################
 if [[ ($CONTINUE_PROCESSES -ge 1 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 1) ]]; then 
-    
+
     # Arrange raw images into a 3D Gaussian Splatting format
     echo -e "\e[36m preprocess_raw_images.py \e[0m"
     conda deactivate && conda activate gaussian_splatting_hair
@@ -220,6 +220,7 @@ fi
 # RECONSTRUCTION CONTINUED - Scalp and Strand Training #
 ########################################################
 if [[ ($CONTINUE_PROCESSES -ge 5 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 5) ]]; then
+
     # Get FLAME mesh scalp maps
     echo -e "\e[36m extract_non_visible_head_scalp.py \e[0m"
     conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
