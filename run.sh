@@ -27,7 +27,7 @@ eval "$(conda shell.bash hook)"
 #################
 # PREPROCESSING #
 #################
-if [[ ($CONTINUE_PROCESSES -ge 1 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 1) ]]; then 
+if [[ ($CONTINUE_PROCESSES -le 1 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 1) ]]; then 
 
     # Arrange raw images into a 3D Gaussian Splatting format
     echo -e "\e[36m preprocess_raw_images.py \e[0m"
@@ -131,7 +131,7 @@ fi
 ##################
 # RECONSTRUCTION #
 ##################
-if [[ ($CONTINUE_PROCESSES -ge 2 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 2) ]]; then
+if [[ ($CONTINUE_PROCESSES -le 2 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 2) ]]; then
     
     # Run 3D Gaussian Splatting reconstruction
     echo -e "\e[36m train_gaussians.py \e[0m"
@@ -173,7 +173,7 @@ fi
 ###########
 # REPLACE #
 ###########
-if [[ ($CONTINUE_PROCESSES -ge 3 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 3) ]]; then
+if [[ ($CONTINUE_PROCESSES -le 3 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 3) ]]; then
     
     # Replace mesh_final.obj with obj located in Scene
     if [[ $REPLACE_FLAME_FITTING_MESH -eq 1 ]]; then 
@@ -189,7 +189,7 @@ fi
 ############################
 # RECONSTRUCTION CONTINUED #
 ############################
-if [[ ($CONTINUE_PROCESSES -ge 4 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 4) ]]; then
+if [[ ($CONTINUE_PROCESSES -le 4 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 4) ]]; then
     
     # Crop the reconstructed scene
     echo -e "\e[36m scale_scene_into_sphere.py \e[0m"
@@ -219,7 +219,7 @@ fi
 ########################################################
 # RECONSTRUCTION CONTINUED - Scalp and Strand Training #
 ########################################################
-if [[ ($CONTINUE_PROCESSES -ge 5 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 5) ]]; then
+if [[ ($CONTINUE_PROCESSES -le 5 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 5) ]]; then
 
     # Get FLAME mesh scalp maps
     echo -e "\e[36m extract_non_visible_head_scalp.py \e[0m"
@@ -268,7 +268,7 @@ fi
 ##################
 # VISUALIZATIONS #
 ##################
-if [[ ($CONTINUE_PROCESSES -ge 6 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 6) ]]; then
+if [[ ($CONTINUE_PROCESSES -le 6 || $CONTINUE_PROCESSES -eq 0) && ($EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 6) ]]; then
     
     # Export the resulting strands as pkl and ply
     echo -e "\e[36m export_curves.py \e[0m"
