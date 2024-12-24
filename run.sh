@@ -1,10 +1,36 @@
 export CONTINUE_PROCESSES=0  # Set to 0 to run all from beginning (options 0-27)
 export EXIT_AFTER_PROCESS=0  # Set to 0 for no exit (options 0-27)
 
-# Check if CONTINUE_PROCESSES or EXIT_AFTER_PROCESS are valid numbers
-if [[ $CONTINUE_PROCESSES -lt 0 || $CONTINUE_PROCESSES -gt 27 ]] && [[ $EXIT_AFTER_PROCESS -lt 0 || $EXIT_AFTER_PROCESS -gt 27 ]]; then
-    echo -e "\e[36mInvalid continue or exit value\e[0m"
-    exit 0
+export REPLACE_FLAME_FITTING_MESH=0 # 1 to replace mesh_final.obj with custom obj 0 to use default - added by hemy 22/12/24
+
+# Function to print an error message in cyan and exit
+error() {
+  echo -e "\e[36mError: $1\e[0m"
+  exit 1
+}
+
+# Validate CONTINUE_PROCESSES
+if [[ $CONTINUE_PROCESSES -lt 0 ]]; then
+  error "Invalid continue value: Must be a non-negative number."
+elif [[ $CONTINUE_PROCESSES -gt 27 ]]; then
+  error "Invalid continue value: Exceeds the maximum number of processes (27)."
+fi
+
+# Validate EXIT_AFTER_PROCESS
+if [[ $EXIT_AFTER_PROCESS -lt 0 ]]; then
+  error "Invalid exit value: Must be a non-negative number."
+elif [[ $EXIT_AFTER_PROCESS -gt 27 ]]; then
+  error "Invalid exit value: Exceeds the maximum number of processes (27)."
+fi
+
+# Check the relationship between the two values
+if [[ $EXIT_AFTER_PROCESS -gt 0 && $EXIT_AFTER_PROCESS -lt $CONTINUE_PROCESSES ]]; then
+  error "Invalid exit value: Cannot be less than continue process value when not defult (0)."
+fi
+
+# Validate REPLACE_FLAME_FITTING_MESH
+if [[ $REPLACE_FLAME_FITTING_MESH -lt 0 || $REPLACE_FLAME_FITTING_MESH -gt 1 ]]; then
+  error "Invalid replace flame fitting mesh value: Must be 0 or 1."
 fi
 
 export GPU="0"
@@ -13,8 +39,6 @@ export EXP_NAME_1="stage1"
 export EXP_NAME_2="stage2"
 export EXP_NAME_3="stage3"
 export EXP_PATH_1=$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1
-
-export REPLACE_FLAME_FITTING_MESH=1 # 1 to replace mesh_final.obj with custom obj 0 to use default - added by hemy 22/12/24
 
 #
 # Ensure that the following environment variables are accessible to the script:
