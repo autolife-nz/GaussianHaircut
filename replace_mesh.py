@@ -16,6 +16,11 @@ def replace_mesh_final(data_path, flame_mesh_path):
       flame_mesh_path: Full path to the mesh_final.obj file to be replaced.
     """
 
+    # Check if the data path exists
+    if not os.path.exists(data_path):
+        print(f"\033[91mError: Data path '{data_path}' does not exist.\033[0m")
+        return
+
     # Change to the data directory
     os.chdir(data_path)
 
@@ -23,22 +28,34 @@ def replace_mesh_final(data_path, flame_mesh_path):
     obj_files = [f for f in os.listdir('.') if f.endswith('.obj')]
     obj_files.sort()
     if not obj_files:
-        print("No .obj files found in", data_path)
+        print(f"\033[91mError: No .obj files found in {data_path}\033[0m")
         return
 
     obj_file = obj_files[0]
+
+    # Check if the flame mesh path exists
+    if not os.path.exists(flame_mesh_path):
+        print(f"\033[91mError: Flame mesh path '{flame_mesh_path}' does not exist.\033[0m")
+        return
 
     # Create "selected_obj" directory if it doesn't exist
     os.makedirs("selected_obj", exist_ok=True)
 
     # Copy the selected .obj file to the "selected_obj" directory
-    shutil.copy(obj_file, os.path.join("selected_obj", obj_file))
+    try:
+        shutil.copy(obj_file, os.path.join("selected_obj", obj_file))
+    except Exception as e:
+        print(f"\033[91mError: Could not copy '{obj_file}' to 'selected_obj': {e}\033[0m")
+        return
 
     # Replace mesh_final.obj with the selected .obj file
-    shutil.copy(os.path.join("selected_obj", obj_file), flame_mesh_path)
+    try:
+        shutil.copy(os.path.join("selected_obj", obj_file), flame_mesh_path)
+    except Exception as e:
+        print(f"\033[91mError: Could not replace '{flame_mesh_path}' with '{obj_file}': {e}\033[0m")
+        return
 
-    print("Path:", flame_mesh_path)  # Print the path
-    print("Replaced mesh_final.obj with", obj_file)
+    print(f"\033[92mSuccess: Replaced mesh_final.obj with {obj_file} at {flame_mesh_path}\033[0m") 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Replace mesh_final.obj with a selected .obj file.")
