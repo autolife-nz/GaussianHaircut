@@ -218,10 +218,50 @@ if [[ $CONTINUE_PROCESSES -le 16 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFT
         --fitted_camera_path $EXP_PATH_1/cameras/30000_matrices.pkl
 fi
 
+if [[ $CONTINUE_PROCESSES -le 17 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 17 ]]; then
+    # Crop the reconstructed scene
+    echo -e "\e[36m scale_scene_into_sphere.py \e[0m"
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
+    CUDA_VISIBLE_DEVICES="$GPU" python scale_scene_into_sphere.py \
+        --path_to_data $DATA_PATH \
+        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000
+fi
+
+if [[ $CONTINUE_PROCESSES -le 18 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 18 ]]; then
+    # Remove hair Gaussians that intersect with the FLAME head mesh
+    echo -e "\e[36m filter_flame_intersections.py \e[0m"
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
+    CUDA_VISIBLE_DEVICES="$GPU" python filter_flame_intersections.py \
+        --flame_mesh_dir $DATA_PATH/flame_fitting/$EXP_NAME_1 \
+        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000 \
+        --project_dir $PROJECT_DIR/ext/NeuralHaircut
+fi
+
+if [[ $CONTINUE_PROCESSES -le 19 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 19 ]]; then
+    # Run rendering for training views
+    echo -e "\e[36m render_gaussians.py \e[0m"
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src
+    CUDA_VISIBLE_DEVICES="$GPU" python render_gaussians.py \
+        -s $DATA_PATH -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" \
+        --skip_test --scene_suffix "_cropped" --iteration 30000 \
+        --trainable_cameras --trainable_intrinsics --use_barf
+fi
+
+if [[ $CONTINUE_PROCESSES -le 20 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 20 ]]; then
+    # Get FLAME mesh scalp maps
+    echo -e "\e[36m extract_non_visible_head_scalp.py \e[0m"
+    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
+    CUDA_VISIBLE_DEVICES="$GPU" python extract_non_visible_head_scalp.py \
+        --project_dir $PROJECT_DIR/ext/NeuralHaircut --data_dir $DATA_PATH \
+        --flame_mesh_dir $DATA_PATH/flame_fitting/$EXP_NAME_1 \
+        --cams_path $DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1/cameras/30000_matrices.pkl \
+        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1"
+fi
+
 ###########
 # REPLACE #
 ###########
-if [[ $CONTINUE_PROCESSES -le 17 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 17 ]]; then
+if [[ $CONTINUE_PROCESSES -le 21 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 21 ]]; then
     # Replace mesh_final.obj with obj located in Scene
     if [[ $REPLACE_FLAME_FITTING_MESH -eq 1 ]]; then 
         echo -e "\e[36m replace_mesh.py \e[0m"
@@ -235,46 +275,6 @@ fi
 ############################
 # RECONSTRUCTION CONTINUED #
 ############################
-if [[ $CONTINUE_PROCESSES -le 18 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 18 ]]; then
-    # Crop the reconstructed scene
-    echo -e "\e[36m scale_scene_into_sphere.py \e[0m"
-    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
-    CUDA_VISIBLE_DEVICES="$GPU" python scale_scene_into_sphere.py \
-        --path_to_data $DATA_PATH \
-        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000
-fi
-
-if [[ $CONTINUE_PROCESSES -le 19 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 19 ]]; then
-    # Remove hair Gaussians that intersect with the FLAME head mesh
-    echo -e "\e[36m filter_flame_intersections.py \e[0m"
-    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
-    CUDA_VISIBLE_DEVICES="$GPU" python filter_flame_intersections.py \
-        --flame_mesh_dir $DATA_PATH/flame_fitting/$EXP_NAME_1 \
-        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" --iter 30000 \
-        --project_dir $PROJECT_DIR/ext/NeuralHaircut
-fi
-
-if [[ $CONTINUE_PROCESSES -le 20 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 20 ]]; then
-    # Run rendering for training views
-    echo -e "\e[36m render_gaussians.py \e[0m"
-    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src
-    CUDA_VISIBLE_DEVICES="$GPU" python render_gaussians.py \
-        -s $DATA_PATH -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1" \
-        --skip_test --scene_suffix "_cropped" --iteration 30000 \
-        --trainable_cameras --trainable_intrinsics --use_barf
-fi
-
-if [[ $CONTINUE_PROCESSES -le 21 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 21 ]]; then
-    # Get FLAME mesh scalp maps
-    echo -e "\e[36m extract_non_visible_head_scalp.py \e[0m"
-    conda activate gaussian_splatting_hair && cd $PROJECT_DIR/src/preprocessing
-    CUDA_VISIBLE_DEVICES="$GPU" python extract_non_visible_head_scalp.py \
-        --project_dir $PROJECT_DIR/ext/NeuralHaircut --data_dir $DATA_PATH \
-        --flame_mesh_dir $DATA_PATH/flame_fitting/$EXP_NAME_1 \
-        --cams_path $DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1/cameras/30000_matrices.pkl \
-        -m "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1"
-fi
-
 if [[ $CONTINUE_PROCESSES -le 22 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFTER_PROCESS -eq 0 || $EXIT_AFTER_PROCESS -ge 22 ]]; then
 
     # Run latent hair strands reconstruction
@@ -310,7 +310,7 @@ if [[ $CONTINUE_PROCESSES -le 23 || $CONTINUE_PROCESSES -eq 0 ]] && [[ $EXIT_AFT
         --iterations 10000 --port "800$GPU"
 
     ######################################### HERE #############################################
-    #rm -rf "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1/train_cropped"
+    rm -rf "$DATA_PATH/3d_gaussian_splatting/$EXP_NAME_1/train_cropped"
 fi
 
 ##################
